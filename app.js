@@ -57,6 +57,37 @@ app.get('/greetings', (req, res) => {
     res.send(greeting);
 })
 
+// -------------- ASSIGNMENT --------------//
+// DRILL 1
+app.get('/sum', (req, res) => {
+    const a = req.query.a;
+    const b = req.query.b;
+
+    if (!a){
+        return res.status(400).send('Please provide a value `a`');
+    }
+    if (!b){
+        return res.status(400).send('Please provide a value `b`');
+    }
+
+    //convert to numbers
+    const numA = parseFloat(a);
+    const numB = parseFloat(b);
+
+    //handle NaN
+    if (isNaN(numA)) {
+        return res.status(400).send('`a` must be a number. Try again.');
+    }
+    if (isNaN(numB)) {
+        return res.status(400).send('`b` must be a number. Try again.');
+    }
+
+    //compute numbers
+    const sum = `The sum of ${a} and ${b} is ${numA + numB}.`
+    res.send(sum);
+})
+
+
 app.listen(8000, () => {
   console.log('Express server is listening on port 8000!');
 });
