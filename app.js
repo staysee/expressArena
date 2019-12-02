@@ -21,7 +21,7 @@ app.get('/pizza/pepperoni', (req, res) => {
 app.get('/pizza/pineapple', (req, res) => {
     res.send('We don\'t serve that here. Never call again!');
 })
-
+//checking out some properties from the request
 app.get('/echo', (req, res) => {
     const responseText = `Here are some details of your request:
         Base URL: ${req.baseUrl}
@@ -30,6 +30,32 @@ app.get('/echo', (req, res) => {
     `;
     res.send(responseText);
 });
+
+//examining the query
+app.get('/queryViewer', (req, res) => {
+    console.log(req.query);
+    res.end(); //do not send any data back to the client
+});
+
+//we are interested in name and race of fantasy characters. both values required
+app.get('/greetings', (req, res) => {
+    //1. get values from the request
+    const name = req.query.name;
+    const race = req.query.race;
+    //2. validate the values
+    if (!name){
+        //3. name was not provided
+        return res.status(400).send('Please provide a name');
+    }
+    if (!race) {
+        //3. race was not provided
+        return res.status(400).send('Please provide a race');
+    }
+    //4. and 5. both name and race are valid so do the processing
+    const greeting = `Greetings ${name} the ${race}, welcome to our kingdom`;
+    //6. send the response
+    res.send(greeting);
+})
 
 app.listen(8000, () => {
   console.log('Express server is listening on port 8000!');
