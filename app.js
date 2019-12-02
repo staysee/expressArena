@@ -59,6 +59,11 @@ app.get('/greetings', (req, res) => {
 
 // -------------- ASSIGNMENT --------------//
 // DRILL 1
+// Create a route handler function on the path /sum that accepts
+// two query parameters named a and b and find the sum of the two values. 
+// Return a string in the format "The sum of a and b is c". Note that query 
+// parameters are always strings so some thought should be given to 
+// converting them to numbers.
 app.get('/sum', (req, res) => {
     const a = req.query.a;
     const b = req.query.b;
@@ -87,6 +92,62 @@ app.get('/sum', (req, res) => {
     res.send(sum);
 })
 
+// DRILL 2 -- Create an endpoint /cipher. The handler function should 
+// accept a query parameter named text and one named shift. Encrypt the text 
+// using a simple shift cipher also known as a Caesar Cipher. It is a simple 
+// substitution cipher where each letter is shifted a certain number of places 
+// down the alphabet. So if the shift was 1 then A would be replaced by B, and B 
+// would be replaced by C and C would be replaced by D and so on until finally Z 
+// would be replaced by A. using this scheme encrypt the text with the given shift 
+// and return the result to the client. Hint - String.fromCharCode(65) is an uppercase A 
+// and 'A'.charCodeAt(0) is the number 65. 65 is the integer value of uppercase A in UTF-16. 
+// See the documentation for details.
+app.get('/cipher', (req, res) => {
+    const text = req.query.text;
+    const shift = req.query.shift;
+
+    // both values required. shift must be a number.
+    if (!text) {
+        return res.status(400).send('text is required.')
+    }
+    if (!shift) {
+        return res.status(400).send('shift is required.');
+    }
+
+    const numShift = parseFloat(shift);
+    if (isNaN(numShift)) {
+        return res.status(400).send('shift must be a number.');
+    }
+
+    // hint: String.fromCharCode(65) is an uppercase A
+    // 'A'.charCodeAt(0) is the number 65
+
+    const start = 'A'.charCodeAt(0);
+
+    // get the text, find each char code and check if it falls between A-Z
+    const textArr = text.toUpperCase().split('');
+    const cipher = textArr.map( char => {
+        const code = char.charCodeAt(0);    // get the charcode
+        // if not A-Z
+        if (code < start || code > (start + 26)){
+            return code
+        }
+
+        let diff = code - start;
+        //apply the shift
+        let shiftedDiff = diff + numShift;
+        //if shiftedDiff is higher than Z
+        shiftedDiff = shiftedDiff % 26;
+
+        //find the character code  with the shiftedDiff and convert to String
+        const shiftedChar = String.fromCharCode(start + shiftedDiff);
+        
+        return shiftedChar
+    })
+    .join("");
+    //return response
+    res.send(cipher);
+})
 
 app.listen(8000, () => {
   console.log('Express server is listening on port 8000!');
