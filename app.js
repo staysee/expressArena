@@ -149,6 +149,73 @@ app.get('/cipher', (req, res) => {
     res.send(cipher);
 })
 
+// DRILL 3 - To send an array of values to the server via a query string simply 
+// repeat the key with different values. For instance, the query string ?arr=1&arr=2&arr=3 results 
+// in the query object { arr: [ '1', '2', '3' ] }. Create a new endpoint /lotto that accepts an 
+// array of 6 distinct numbers between 1 and 20 named numbers. The function then randomly 
+// generates 6 numbers between 1 and 20. Compare the numbers sent in the query with the randomly 
+// generated numbers to determine how many match. If fewer than 4 numbers match respond with the 
+// string "Sorry, you lose". If 4 numbers match respond with the string "Congratulations, you win 
+// a free ticket", if 5 numbers match respond with "Congratulations! You win $100!". If all 6 numbers 
+// match respond with "Wow! Unbelievable! You could have won the mega millions!".
+app.get('/lotto', (req, res) => {
+    const numbers = req.query.numbers;
+
+    //check if numbers exist, if it is an array, and are 6 numbers between 1-20
+    if (!numbers) {
+        res.status(400).send('numbers required');
+    }
+    if (!Array.isArray(numbers)){
+        res.status(400).send('numbers must be an array.');
+    }
+
+    const guesses = numbers
+        .map(n => parseInt(n))
+        .filter(n => !Number.isNaN(n) && (n >= 1 && n <= 20) );
+    
+    if ((guesses.length != 6) || (guesses.length !== new Set(guesses).size)) {
+        console.log('not unique')
+        return res.status(400).send('numbers must contain 6 unique integers between 1 and 20');
+    }
+
+    console.log(`guesses`, guesses)
+
+    const winningNumbers = new Set;
+    while (winningNumbers.size < 6)
+    winningNumbers.add(Math.floor(Math.random() * 20) + 1 );
+
+    console.log(`winning numbers: `, [...winningNumbers]);
+
+    //compare guesses to winning numbers
+    let notGuessed = [...winningNumbers].filter( num => !guesses.includes(num));
+    console.log(`notGuessed`, notGuessed)
+
+    let reponse;
+    console.log(notGuessed.length)
+    switch(notGuessed.length){
+        case 0:
+            response = "Wow! Unbelievable! You could have won the mega millions!"
+            break;
+        case 1:
+            response = "Congratulations! You win $100!"
+            break;
+        case 2:
+            response = "Congratulations! You win a free ticket."
+            break;
+        default:
+            response = "Sorry, you lose."
+    }
+
+    res.send(response);
+})
+
+
+
+
+
+
+
+
 app.listen(8000, () => {
   console.log('Express server is listening on port 8000!');
 });
